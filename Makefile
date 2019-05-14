@@ -4,6 +4,7 @@ INCLUDE_DIR  = $(SOURCE_DIR)
 SOURCE_FILES_FOUND = $(wildcard $(SOURCE_DIR)/*.c)
 SOURCE_FILES = $(SOURCE_FILES_FOUND:./src/%=%)
 SOURCE_FILES += eeprom_emulation/st_eeprom.c
+SOURCE_FILES += protocol/flysky_a7105.c protocol/flysky_afhds2a_a7105.c protocol/protocol.c protocol/spi/a7105.c
 OBJECT_DIR   := $(ROOT)/obj
 BIN_DIR      = $(ROOT)/bin
 CFLAGS  = -O1 -g
