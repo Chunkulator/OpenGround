@@ -13,23 +13,17 @@
     along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifdef MODULAR
-  //Allows the linker to properly relocate
-  #define DEVO_Cmds PROTO_Cmds
-  #pragma long_calls
-#endif
-#include "common.h"
-#include "config/tx.h"
+// #include "common.h"
+// #include "config/tx.h"
+#include "timeout.h"
 #include "protocol/interface.h"
-#include "protospi.h"
+#include "protocol/protospi.h"
 
-#ifdef PROTO_HAS_A7105
-
-static void CS_HI() {
+static void CS_HI(void) {
     PROTO_CS_HI(A7105);
 }
 
-static void CS_LO() {
+static void CS_LO(void) {
     PROTO_CS_LO(A7105);
 }
 
@@ -88,7 +82,7 @@ void A7105_SetTxRxMode(enum TXRX_State mode)
         A7105_WriteReg(A7105_0B_GPIO1_PIN1, 0x31);
         A7105_WriteReg(A7105_0C_GPIO2_PIN_II, 0x33);
     } else {
-        //The A7105 seems to some with a cross-wired power-amp (A7700)
+        //The A7105 seems to come with a cross-wired power-amp (A7700)
         //On the XL7105-D03, TX_EN -> RXSW and RX_EN -> TXSW
         //This means that sleep mode is wired as RX_EN = 1 and TX_EN = 1
         //If there are other amps in use, we'll need to fix this
@@ -100,7 +94,7 @@ void A7105_SetTxRxMode(enum TXRX_State mode)
 int A7105_Reset()
 {
     A7105_WriteReg(0x00, 0x00);
-    usleep(1000);
+    timeout_delay_ms(1);
     //Set both GPIO as output and low
     A7105_SetTxRxMode(TXRX_OFF);
     int result = A7105_ReadReg(0x10) == 0x9E;
@@ -178,5 +172,3 @@ void A7105_AdjustLOBaseFreq(s16 offset)
     A7105_WriteReg( A7105_13_PLL_V, bfp & 0xff);
 }
 
-//#pragma long_calls_off
-#endif

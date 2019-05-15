@@ -13,12 +13,12 @@
  along with Deviation.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
+//#include "common.h"
 #include "interface.h"
-#include "mixer.h"
-#include "config/model.h"
-#include "config/tx.h"
-#include "telemetry.h"
+// #include "mixer.h"
+// #include "config/model.h"
+// #include "config/tx.h"
+// #include "telemetry.h"
 
 #ifdef PROTO_HAS_A7105
 

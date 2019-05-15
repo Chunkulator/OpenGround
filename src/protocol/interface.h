@@ -1,6 +1,20 @@
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
 
+#include <stdint.h>
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+
+enum Radio
+{
+    A7105
+};
+
 enum ProtoCmds {
     PROTOCMD_INIT,
     PROTOCMD_DEINIT,
@@ -36,26 +50,19 @@ enum PinConfigState {
 #define EATRG (2)
 #define TAERG (3)
 
-#ifndef MODULAR
+#define PROTODEF(proto, module, map, cmd, name) proto,
+enum protocol_id
+{
+    PROTOCOL_NONE,
+    #include "protocol.h" 
+    PROTOCOL_COUNT
+};
+#undef PROTODEF
+
 #define PROTODEF(proto, module, map, cmd, name) extern uintptr_t cmd(enum ProtoCmds);
 #include "protocol.h"
 #undef PROTODEF
-#endif
 
-#ifdef PROTO_HAS_A7105
 #include "iface_a7105.h"
-#endif
-
-#ifdef PROTO_HAS_CYRF6936
-#include "iface_cyrf6936.h"
-#endif
-
-#ifdef PROTO_HAS_CC2500
-#include "iface_cc2500.h"
-#endif
-
-#ifdef PROTO_HAS_NRF24L01
-#include "iface_nrf24l01.h"
-#endif
 
 #endif //_INTERFACE_H_
