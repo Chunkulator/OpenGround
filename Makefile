@@ -21,7 +21,7 @@ FP_FLAGS        ?= -msoft-float
 ARCH_FLAGS      = -mthumb -mcpu=cortex-m0 $(FP_FLAGS)
 
 LDSCRIPT = linker/stm32f072.ld
-TARGET   = openground
+TARGET   = robotx
 
 CFLAGS += -I./src
 LDFLAGS += -L./src
@@ -46,9 +46,6 @@ OBJCOPY		:= $(PREFIX)-objcopy
 OBJDUMP		:= $(PREFIX)-objdump
 GDB		:= $(PREFIX)-gdb
 STFLASH		= $(shell which st-flash)
-STYLECHECK	:= /checkpatch.pl
-STYLECHECKFLAGS	:= --no-tree -f --terse --mailback
-STYLECHECKFILES	:= $(shell find . -name '*.[ch]')
 OPT		:= -Os
 CSTD		?= -std=gnu99
 
@@ -110,7 +107,7 @@ LDLIBS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 .SECONDEXPANSION:
 .SECONDARY:
 
-all: stylecheck elf 
+all: elf 
 
 elf: $(BIN_DIR)/$(TARGET).elf
 bin: $(BIN_DIR)/$(TARGET).bin
@@ -157,24 +154,17 @@ $(BIN_DIR)/%.elf $(BIN_DIR)/%.map: $(OBJS) $(LDSCRIPT) bin_dir
 	@printf "  LD      $(*).elf\n"
 	$(Q)$(LD) $(TGT_LDFLAGS) $(LDFLAGS) $(OBJS) $(LDLIBS) -o $(BIN_DIR)/$(*).elf
 
-$(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c libopencm3 obj_dir src/hoptable.h 
+$(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c libopencm3 obj_dir
 	@printf "  CC      $(*).c\n"
 	$(Q)$(CC) $(TGT_CFLAGS) $(CFLAGS) -o $(OBJECT_DIR)/$(*).o -c $(SOURCE_DIR)/$(*).c
-
-src/hoptable.h: 
-	python ./scripts/generate_hoptable.py > src/hoptable.h
 
 clean:
 	@#printf "  CLEAN\n"
 	$(Q)$(RM) $(OBJECT_DIR)/*.o $(OBJECT_DIR)/*.d $(BIN_DIR)/*.elf $(BIN_DIR)*.bin $(BIN_DIR)*.hex $(BIN_DIR)/*.srec $(BIN_DIR)/*.lst $(BIN_DIR)/*.map generated.* ${OBJS} ${OBJS:%.o:%.d}
 
-stylecheck: $(HEADER_FILES) $(SOURCE_FILES_FOUND)
-	@./stylecheck/cpplint.py --filter=-build/include,-build/storage_class,-readability/casting,-runtime/arrays --extensions="h,c" --root=src --linelength=120 $(HEADER_FILES) $(SOURCE_FILES_FOUND) || true
-
 %.stlink-flash: %.bin
 	@printf "  FLASH  $<\n"
 	$(STFLASH) write $(*).bin 0x8000000
-
 
 bin_dir:
 	@mkdir -p ${BIN_DIR}
@@ -240,6 +230,6 @@ submodules:
 	@git submodule update --init -- libopencm3
 
 
-.PHONY: images clean stylecheck styleclean elf bin hex srec list submodules bin_dir obj_dir stylecheck
+.PHONY: images clean styleclean elf bin hex srec list submodules bin_dir obj_dir
 
 -include $(OBJS:.o=.d)
